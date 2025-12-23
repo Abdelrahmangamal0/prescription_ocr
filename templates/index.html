@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prescription OCR System</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1>💊 Prescription OCR System</h1>
+        <p class="subtitle">
+            Upload a prescription image to extract text and detect the medication
+        </p>
+
+        <label class="upload-box">
+            <input type="file" id="imageInput" accept="image/*">
+            <span>📷 Choose Prescription Image</span>
+        </label>
+
+        <button onclick="sendImage()">Detect</button>
+
+        <div class="result">
+            <h3>📝 Detected Text</h3>
+            <pre id="text">---</pre>
+
+            <h3>💊 Predicted Drug</h3>
+            <div id="drug" class="drug">---</div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function sendImage() {
+    const input = document.getElementById("imageInput");
+    if (!input.files.length) {
+        alert("Please choose an image first");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", input.files[0]);
+
+    document.getElementById("text").textContent = "Processing...";
+    document.getElementById("drug").textContent = "...";
+
+    const res = await fetch("/predict", {
+        method: "POST",
+        body: formData
+    });
+
+    const data = await res.json();
+    document.getElementById("text").textContent = data.detected_text || "No text detected";
+    document.getElementById("drug").textContent = data.predicted_drug || "Unknown";
+}
+</script>
+
+</body>
+</html>
